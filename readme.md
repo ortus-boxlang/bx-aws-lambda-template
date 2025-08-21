@@ -527,6 +527,7 @@ The `LambdaIntegrationTest` suite includes:
 - **Mock AWS Context** - Realistic Lambda environment simulation
 
 **Test scenarios covered:**
+
 ```java
 @Test void testBasicExecution()        // Core Lambda functionality
 @Test void testApiGatewayEvent()       // HTTP API simulation
@@ -540,6 +541,7 @@ The `LambdaIntegrationTest` suite includes:
 For **HTTP endpoint testing**, start a local API Gateway simulation:
 
 **Background Server (Recommended for Development):**
+
 ```bash
 # Start server in background
 ./gradlew startSamServerBackground
@@ -553,6 +555,7 @@ curl -X POST http://localhost:3000 -d '{"test":"data"}' -H 'Content-Type: applic
 ```
 
 **Foreground Server:**
+
 ```bash
 # Start server in foreground (blocks terminal)
 ./gradlew startSamServer
@@ -560,6 +563,7 @@ curl -X POST http://localhost:3000 -d '{"test":"data"}' -H 'Content-Type: applic
 ```
 
 **Test Endpoints:**
+
 ```bash
 # Manual testing examples with curl
 curl http://localhost:3000
@@ -572,9 +576,9 @@ curl -X POST http://localhost:3000/api/users \
 # - Insomnia
 # - HTTPie: http POST localhost:3000/api/users name=John email=john@example.com
 ```
-```
 
 **Development Workflow:**
+
 1. 🚀 `./gradlew startSamServerBackground` - Start server
 2. ✏️ Edit `src/main/bx/Lambda.bx` - Make changes
 3. 🔄 `./gradlew build` - Rebuild (server auto-reloads)
@@ -582,6 +586,7 @@ curl -X POST http://localhost:3000/api/users \
 5. 🔁 Repeat steps 2-4 for rapid development
 
 **Requirements:**
+
 - SAM CLI installed: `brew install aws-sam-cli`
 - AWS credentials configured (can use dummy values for local testing)
 
