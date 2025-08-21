@@ -197,7 +197,7 @@ task bumpPatchVersion {
 task runLocal( type: JavaExec ) {
 	dependsOn compileTestJava
 	classpath = sourceSets.test.runtimeClasspath
-	mainClass = 'com.myproject.LocalLambdaRunner'
+	mainClass = 'com.myproject.runner.LocalLambdaRunner'
 
 	// Set default event file
 	systemProperty 'eventFile', project.findProperty('eventFile') ?: 'workbench/event.json'
@@ -220,7 +220,7 @@ task runLocal( type: JavaExec ) {
 task runLocalApi( type: JavaExec ) {
 	dependsOn compileTestJava
 	classpath = sourceSets.test.runtimeClasspath
-	mainClass = 'com.myproject.LocalLambdaRunner'
+	mainClass = 'com.myproject.runner.LocalLambdaRunner'
 	systemProperty 'eventFile', 'workbench/sampleEvents/api.json'
 
 	// Force JVM exit after execution to prevent hanging
@@ -238,7 +238,7 @@ task runLocalApi( type: JavaExec ) {
 task runLocalLegacy( type: JavaExec ) {
 	dependsOn compileTestJava
 	classpath = sourceSets.test.runtimeClasspath
-	mainClass = 'com.myproject.LocalLambdaRunner'
+	mainClass = 'com.myproject.runner.LocalLambdaRunner'
 	systemProperty 'eventFile', 'workbench/sampleEvents/event.json'
 
 	// Force JVM exit after execution to prevent hanging

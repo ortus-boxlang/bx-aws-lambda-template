@@ -118,9 +118,10 @@ Here is a comprehensive overview of the project structure:
     - 📄 _(Add your BoxLang classes here)_
 - 🧪 **`test/`** - Test source code
   - ☕ `java/com/myproject/` - JUnit test classes
-    - 🎯 `LambdaRunnerTest.java` - Main Lambda integration tests
-    - 🔧 `TestContext.java` - Mock AWS Lambda Context
-    - 📝 `TestLogger.java` - Test logging utilities
+    - 🎯 `LambdaIntegrationTest.java` - Comprehensive Lambda integration tests
+    - 🔧 `mocks/TestContext.java` - Mock AWS Lambda Context
+    - 📝 `mocks/TestLogger.java` - Test logging utilities
+    - 🏃 `runner/LocalLambdaRunner.java` - Local Lambda test runner
 - 🗂️ **`resources/`** - Runtime resources
   - ⚙️ `boxlang.json` - BoxLang runtime configuration
   - 📦 `boxlang_modules/` - Local BoxLang modules (auto-packaged)
@@ -334,9 +335,12 @@ build/distributions/
 
 ```
 src/test/java/com/myproject/
-├── LambdaRunnerTest.java    # Main integration tests
-├── TestContext.java         # Mock AWS Lambda Context
-└── TestLogger.java          # Test logging utilities
+├── LambdaIntegrationTest.java    # Comprehensive integration tests
+├── mocks/
+│   ├── TestContext.java         # Mock AWS Lambda Context
+│   └── TestLogger.java          # Test logging utilities
+└── runner/
+    └── LocalLambdaRunner.java   # Local Lambda test runner
 ```
 
 ### ✅ Running Tests
@@ -346,7 +350,7 @@ src/test/java/com/myproject/
 ./gradlew test
 
 # Run specific test class
-./gradlew test --tests "com.myproject.LambdaRunnerTest"
+./gradlew test --tests "com.myproject.LambdaIntegrationTest"
 
 # Run with detailed output
 ./gradlew test --info
@@ -424,11 +428,32 @@ workbench/sampleEvents/
 #### 🔧 Local Test Runner Features
 
 The built-in `LocalLambdaRunner` provides:
+
 - ⚡ **Fast execution** - No deployment required
 - 📊 **Performance metrics** - Shows execution time
 - 🔍 **JSON output formatting** - Pretty-printed responses
 - 📄 **Multiple event support** - Easy event switching
 - ❌ **Error handling** - Clear error messages with stack traces
+
+#### 🧪 Enhanced Integration Tests
+
+The `LambdaIntegrationTest` suite includes:
+
+- **Basic Lambda execution** - Validates core functionality
+- **API Gateway simulation** - Tests HTTP request/response handling
+- **Complex nested data** - Handles rich JSON payloads
+- **Performance testing** - Large payload stress testing (5-second timeout)
+- **Error handling** - Null value and edge case testing
+- **Mock AWS Context** - Realistic Lambda environment simulation
+
+**Test scenarios covered:**
+```java
+@Test void testBasicExecution()        // Core Lambda functionality
+@Test void testApiGatewayEvent()       // HTTP API simulation
+@Test void testComplexEvent()          // Nested JSON structures
+@Test void testLargePayload()          // Performance validation
+@Test void testNullHandling()          // Edge case testing
+```
 
 ## 🚀 AWS Deployment
 
