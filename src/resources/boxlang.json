@@ -37,9 +37,9 @@
 	"trustedCache": true,
 	// The default timezone for the runtime; defaults to the JVM timezone if empty
 	// Please use the IANA timezone database values
-	// On AWS YOU CAN use: ${env:TZ:UTC} to use the environment variable TZ or default to UTC
+	// On AWS YOU CAN use: ${env.TZ:UTC} to use the environment variable TZ or default to UTC
 	// https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime
-	"timezone": "${env:TZ:UTC}",
+	"timezone": "${env.TZ:UTC}",
 	// The default locale for the runtime; defaults to the JVM locale if empty
 	// Please use the IETF BCP 47 language tag values
 	"locale": "",
