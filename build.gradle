@@ -249,3 +249,129 @@ task runLocalLegacy( type: JavaExec ) {
 		println "🚀 Running BoxLang Lambda locally with Legacy API Gateway event..."
 	}
 }
+
+/**
+ * Start SAM local API server for HTTP endpoint testing
+ */
+task startSamServer( type: Exec ) {
+	dependsOn build
+
+	// Check if SAM CLI is available
+	doFirst {
+		try {
+			exec {
+				commandLine 'sam', '--version'
+				standardOutput = new ByteArrayOutputStream()
+				errorOutput = new ByteArrayOutputStream()
+			}
+		} catch (Exception e) {
+			throw new GradleException("""
+❌ SAM CLI not found! Please install it first:
+
+🍺 macOS (Homebrew):
+   brew install aws-sam-cli
+
+🐧 Linux:
+   pip install aws-sam-cli
+
+🪟 Windows:
+   Download from: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html
+
+ℹ️  Alternative: Use ./gradlew runLocal for non-HTTP testing
+			""".stripIndent())
+		}
+
+		println "🌐 Starting SAM local API server..."
+		println "📍 Your Lambda will be available at: http://localhost:3000"
+		println "🔄 Building project first..."
+	}
+
+	workingDir 'workbench'
+	commandLine 'sam', 'local', 'start-api',
+		'--template', 'template-local.yml',
+		'--port', '3000',
+		'--host', '0.0.0.0'
+
+	// Show helpful output
+	doLast {
+		println ""
+		println "✅ SAM server should now be running!"
+		println "🧪 Test your endpoints with:"
+		println "   curl http://localhost:3000"
+		println "   curl -X POST http://localhost:3000 -d '{\"test\":\"data\"}' -H 'Content-Type: application/json'"
+	}
+}
+
+/**
+ * Start SAM local API server in background (daemon mode)
+ */
+task startSamServerBackground( type: Exec ) {
+	dependsOn build
+
+	doFirst {
+		// Check if server is already running
+		try {
+			def response = new URL("http://localhost:3000").getText()
+			println "⚠️  Server already running at http://localhost:3000"
+			println "🛑 Stop it first with: ./gradlew stopSamServer"
+			throw new GradleException("SAM server already running")
+		} catch (ConnectException e) {
+			// Good, port is available
+			println "🌐 Starting SAM local API server in background..."
+		}
+
+		// Create logs directory
+		file('build/sam-logs').mkdirs()
+	}
+
+	workingDir 'workbench'
+	commandLine 'bash', '-c', '''
+		nohup sam local start-api \
+			--template template-local.yml \
+			--port 3000 \
+			--host 0.0.0.0 \
+			> ../build/sam-logs/sam-server.log 2>&1 &
+		echo $! > ../build/sam-logs/sam-server.pid
+	'''
+
+	doLast {
+		// Wait a moment and check if server started
+		Thread.sleep(3000)
+		try {
+			new URL("http://localhost:3000").getText()
+			println "✅ SAM server started in background!"
+			println "📍 Available at: http://localhost:3000"
+			println "📄 Logs: build/sam-logs/sam-server.log"
+			println "🛑 Stop with: ./gradlew stopSamServer"
+		} catch (Exception e) {
+			println "⚠️  Server may still be starting... check build/sam-logs/sam-server.log"
+		}
+	}
+}
+
+/**
+ * Stop the background SAM server
+ */
+task stopSamServer {
+	doLast {
+		def pidFile = file('build/sam-logs/sam-server.pid')
+		if (pidFile.exists()) {
+			def pid = pidFile.text.trim()
+			println "🛑 Stopping SAM server (PID: $pid)..."
+
+			try {
+				exec {
+					commandLine 'kill', pid
+				}
+				pidFile.delete()
+				println "✅ SAM server stopped"
+			} catch (Exception e) {
+				println "⚠️  Could not stop server (may already be stopped)"
+				println "🔍 Check manually: ps aux | grep sam"
+			}
+		} else {
+			println "ℹ️  No SAM server PID file found"
+			println "🔍 Check if server is running: curl http://localhost:3000"
+		}
+	}
+}

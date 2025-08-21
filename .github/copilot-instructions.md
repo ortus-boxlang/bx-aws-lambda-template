@@ -25,6 +25,10 @@ This is a BoxLang AWS Lambda template that wraps a BoxLang runtime inside a Java
   - `./gradlew build`  (uses `shadowJar` and `buildLambdaZip` via `build.gradle`)
 - Run tests:
   - `./gradlew test`
+- Local testing:
+  - `./gradlew runLocal` (basic Lambda execution)
+  - `./gradlew startSamServerBackground` (start HTTP server for API testing)
+  - `./gradlew stopSamServer` (stop HTTP server)
 - Deploy via workbench script (uses AWS CLI + CloudFormation/SAM):
   - `./workbench/2-deploy.sh`  (or inspect `workbench/template.yml` to adapt)
 - Invoke locally via AWS CLI after deploy:

@@ -312,6 +312,9 @@ build/distributions/your-lambda.zip
 | 🏠 `runLocal` | **Run Lambda locally with default event** | Console output |
 | 🌐 `runLocalApi` | **Run Lambda locally with API Gateway event** | Console output |
 | 🔧 `runLocalLegacy` | **Run Lambda locally with legacy API event** | Console output |
+| 🌍 `startSamServer` | **Start SAM local API server (foreground)** | HTTP server at :3000 |
+| 🔄 `startSamServerBackground` | **Start SAM local API server (background)** | HTTP server at :3000 |
+| 🛑 `stopSamServer` | **Stop background SAM server** | - |
 | ✨ `spotlessApply` | Auto-format source code | - |
 | 🔍 `spotlessCheck` | Check code formatting | - |
 | 📋 `tasks` | List all available Gradle tasks | - |
@@ -454,6 +457,56 @@ The `LambdaIntegrationTest` suite includes:
 @Test void testLargePayload()          // Performance validation
 @Test void testNullHandling()          // Edge case testing
 ```
+
+#### 🌐 SAM Local HTTP Server
+
+For **HTTP endpoint testing**, start a local API Gateway simulation:
+
+**Background Server (Recommended for Development):**
+```bash
+# Start server in background
+./gradlew startSamServerBackground
+
+# Your Lambda is now available at http://localhost:3000
+curl http://localhost:3000
+curl -X POST http://localhost:3000 -d '{"test":"data"}' -H 'Content-Type: application/json'
+
+# Stop when done
+./gradlew stopSamServer
+```
+
+**Foreground Server:**
+```bash
+# Start server in foreground (blocks terminal)
+./gradlew startSamServer
+# Press Ctrl+C to stop
+```
+
+**Test Endpoints:**
+```bash
+# Manual testing examples with curl
+curl http://localhost:3000
+curl -X POST http://localhost:3000/api/users \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"John","email":"john@example.com"}'
+
+# Or use your favorite HTTP client:
+# - Postman
+# - Insomnia
+# - HTTPie: http POST localhost:3000/api/users name=John email=john@example.com
+```
+```
+
+**Development Workflow:**
+1. 🚀 `./gradlew startSamServerBackground` - Start server
+2. ✏️ Edit `src/main/bx/Lambda.bx` - Make changes
+3. 🔄 `./gradlew build` - Rebuild (server auto-reloads)
+4. 🧪 `curl http://localhost:3000` - Test changes
+5. 🔁 Repeat steps 2-4 for rapid development
+
+**Requirements:**
+- SAM CLI installed: `brew install aws-sam-cli`
+- AWS credentials configured (can use dummy values for local testing)
 
 ## 🚀 AWS Deployment
 
