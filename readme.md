@@ -498,7 +498,7 @@ This creates a local HTTP endpoint at `http://localhost:3000` where you can:
 ```
 workbench/sampleEvents/
 ├── api.json         # API Gateway HTTP v2.0 event
-├── api-post.json    # POST request with JSON body  
+├── api-post.json    # POST request with JSON body
 ├── event.json       # Legacy API Gateway event
 ├── event-live.json  # Production test payload (used by 3-invoke.sh)
 ├── event-local.json # Local development test payload
@@ -823,7 +823,7 @@ cat workbench/config.local.env
 #### **Daily Development**
 ```bash
 ./gradlew runLocal                   # Test locally
-./gradlew test                      # Run tests  
+./gradlew test                      # Run tests
 ./gradlew build                     # Build package
 ```
 
@@ -903,7 +903,7 @@ Apply this spacing standard to all BoxLang, Java, and configuration code in the 
 # Verify project build
 ./gradlew clean build test
 
-# Test locally before deployment  
+# Test locally before deployment
 ./gradlew runLocal
 
 # Check deployed function
