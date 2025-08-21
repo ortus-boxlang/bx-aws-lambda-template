@@ -1,36 +1,90 @@
+/**
+ * Application.bx
+ *
+ * Bootstrap and initialization for the bx-aws-lambda-template application.
+ *
+ * Responsibilities:
+ * - Initialize application configuration and environment for AWS Lambda execution.
+ * - Register modules, services and dependency bindings required by the runtime.
+ * - Configure logging, error handling and any necessary middleware or filters.
+ * - Prepare Lambda-specific behavior (cold-start optimizations, warm-up handlers).
+ *
+ * Usage:
+ * - Invoked during Lambda startup (cold start) or as part of the Lambda handler setup.
+ * - Implementations should be idempotent and fast to minimize cold-start latency.
+ *
+ * Return value:
+ * - Returns true when initialization completes successfully and the application is ready
+ *   to handle requests.
+ * - On initialization failure, return false or propagate an error so the caller can
+ *   handle the failure appropriately.
+ *
+ * Implementation notes:
+ * - Keep heavy or blocking work out of startup when possible; defer to on-demand handlers.
+ * - Ensure proper error logging to aid debugging in the Lambda environment.
+ * - Extend registration points to add modules, configuration sources, or lifecycle hooks.
+ */
 class{
 
+	// The unique name of the application, used in logs, threads, etc.
 	this.name = "My-AWS-Lambda"
 
+	/**
+	 * Called when the Lambda starts up for the first time, the cold start, careful with what you put here.
+	 */
 	public boolean function onApplicationStart() {
         return true;
     }
 
+	/**
+	 * Called when the Lambda shuts down.
+	 */
     public void function onApplicationEnd( struct applicationScope={} ) {
         return;
     }
 
+	/**
+	 * Called when a new lambda request is received.
+	 * The target page is the actual Boxlang class to execute: Lambda.bx
+	 */
 	public boolean function onRequestStart( required string targetPage ) {
         return true;
     }
 
+	/**
+	 * This is like an AOP around wrapper for your Lambda.
+	 * It receives the lambda target: Lambda.bx or Services.bx
+	 * You can do here before and after advices and then include your lambda for execution.
+	 */
     public void function onRequest( required string targetPage ) {
         include arguments.targetPage;
         return;
     }
 
+	/**
+	 * Called when the Lambda request ends.
+	 */
     public void function onRequestEnd() {
         return;
     }
 
+	/**
+	 * Called when the Lambda request is aborted via an abort call in your code
+	 */
     public void function onAbort( required string targetPage ) {
         return;
     }
 
+	/**
+	 * Global error handler for the Lambda application.
+	 */
     public void function onError( required any exception, required string eventName ) {
         return;
     }
 
+	/**
+	 * Global missing template handler for the Lambda application.
+	 */
     public boolean function onMissingTemplate( required string targetPage ) {
         return true;
     }
