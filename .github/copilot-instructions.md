@@ -13,26 +13,32 @@ This is a BoxLang AWS Lambda template that wraps a BoxLang runtime inside a Java
 
 ## What an AI agent should know immediately
 
-- Build system: use the Gradle wrapper (`./gradlew`) to ensure correct plugin versions and JVM settings. BoxLang runtime is now a Maven dependency.
-- Tests: JUnit tests are in `src/test/java/com/myproject`. Run `./gradlew test`.
-- Packaging: `shadowJar` then `buildLambdaZip` / `build` create `build/distributions/*.zip`. `workbench/2-deploy.sh` runs `gradle build -i` (or `mvn package` alternative) then uses `aws cloudformation package/deploy`.
-- Runtime config: `src/resources/boxlang.json` controls caching, class generation, logging, timeouts, and trustedCache — change these for dev vs prod (e.g. `trustedCache`, `debugMode`).
-- BoxLang modules: add modules to `src/resources/boxlang_modules` or declare them in `box.json`.
+- **Configuration System**: All workbench scripts use `workbench/config.local.env` → `config.env` → environment variables for settings like AWS_LAMBDA_BUCKET, STACK_NAME, FUNCTION_NAME, LAMBDA_MEMORY, LAMBDA_TIMEOUT, ENVIRONMENT.
+- **Build system**: use the Gradle wrapper (`./gradlew`) to ensure correct plugin versions and JVM settings. BoxLang runtime is now a Maven dependency.
+- **Tests**: JUnit tests are in `src/test/java/com/myproject`. Run `./gradlew test`. Local testing via `./gradlew runLocal*` tasks.
+- **Packaging**: `shadowJar` then `buildLambdaZip` / `build` create `build/distributions/*.zip`.
+- **Deployment**: `workbench/2-deploy.sh` uses configuration variables and passes them as CloudFormation parameters to the parameterized `workbench/template.yml`.
+- **Invocation**: `workbench/3-invoke.sh` uses direct function name invocation (no stack lookups), configured via FUNCTION_NAME.
+- **Runtime config**: `src/resources/boxlang.json` controls caching, class generation, logging, timeouts, and trustedCache — change these for dev vs prod (e.g. `trustedCache`, `debugMode`).
+- **BoxLang modules**: add modules to `src/resources/boxlang_modules` or declare them in `box.json`.
 
 ## Commands (exact examples)
 
-- Build (produce deployable ZIP):
-  - `./gradlew build`  (uses `shadowJar` and `buildLambdaZip` via `build.gradle`)
-- Run tests:
-  - `./gradlew test`
-- Local testing:
-  - `./gradlew runLocal` (basic Lambda execution)
+- **Configuration setup**: Copy `workbench/config.env` to `workbench/config.local.env` and customize settings
+- **Build** (produce deployable ZIP): `./gradlew build` (uses `shadowJar` and `buildLambdaZip` via `build.gradle`)
+- **Run tests**: `./gradlew test`
+- **Local testing**:
+  - `./gradlew runLocal` (basic Lambda execution with default event)
+  - `./gradlew runLocalApi` (Lambda with API Gateway event)
+  - `./gradlew runLocalLegacy` (Lambda with legacy API Gateway event)
   - `./gradlew startSamServerBackground` (start HTTP server for API testing)
   - `./gradlew stopSamServer` (stop HTTP server)
-- Deploy via workbench script (uses AWS CLI + CloudFormation/SAM):
-  - `./workbench/2-deploy.sh`  (or inspect `workbench/template.yml` to adapt)
-- Invoke locally via AWS CLI after deploy:
-  - `./workbench/3-invoke.sh` (reads stack resources and runs `aws lambda invoke`)
+- **Deployment workflow**:
+  - `./workbench/0-check-aws.sh` (troubleshoot AWS credentials)
+  - `./workbench/1-create-bucket.sh` (create S3 bucket using config)
+  - `./workbench/2-deploy.sh` (deploy with configuration parameters)
+  - `./workbench/3-invoke.sh` (invoke deployed function by name)
+  - `./workbench/4-cleanup.sh` (clean up resources)
 
 ## Project-specific conventions & patterns
 
@@ -44,9 +50,13 @@ This is a BoxLang AWS Lambda template that wraps a BoxLang runtime inside a Java
 
 ## Integration points & external dependencies
 
-- AWS CLI + CloudFormation/SAM are used by `workbench/*.sh` scripts. The SAM template is `workbench/template.yml` and expects the deployable at `build/distributions/*.zip`.
-- The Lambda handler class is `ortus.boxlang.runtime.aws.LambdaRunner::handleRequest` (SAM `Handler` setting).
-- The runtime JAR is now a Maven dependency `io.boxlang:boxlang-aws-lambda:1.4.0` resolved automatically by Gradle.
+- **Configuration Management**: All scripts use config file hierarchy (`config.local.env` → `config.env` → environment variables) for AWS settings, Lambda parameters, and deployment configuration.
+- **AWS CLI + CloudFormation/SAM**: Used by `workbench/*.sh` scripts. The SAM template `workbench/template.yml` is now parameterized and receives configuration values via `--parameter-overrides`.
+- **Direct Function Invocation**: `3-invoke.sh` uses function name directly (from FUNCTION_NAME config) instead of CloudFormation stack lookups for simplicity.
+- **Event Files**: Production testing uses `workbench/event-live.json` for realistic payloads. Local testing has multiple event files in `workbench/sampleEvents/`.
+- **AWS Resource Outputs**: Template now provides FunctionName and FunctionArn outputs for easy integration.
+- **Lambda Handler**: Still `ortus.boxlang.runtime.aws.LambdaRunner::handleRequest` (SAM `Handler` setting).
+- **Runtime JAR**: Maven dependency `io.boxlang:boxlang-aws-lambda:1.4.0` resolved automatically by Gradle.
 
 ## Useful file pointers (examples to inspect)
 
