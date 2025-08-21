@@ -753,6 +753,7 @@ ENVIRONMENT=production
 ### 📋 **From Zero to Deployed**
 
 #### **1. Initial Setup**
+
 ```bash
 # Clone or download the template
 git clone <your-repo>
@@ -764,6 +765,7 @@ cp workbench/config.env workbench/config.local.env
 ```
 
 #### **2. Development Cycle**
+
 ```bash
 # Test locally during development
 ./gradlew runLocal                    # Quick local test
@@ -776,6 +778,7 @@ curl http://localhost:3000           # Test your endpoints
 ```
 
 #### **3. Pre-Deployment Validation**
+
 ```bash
 # Verify AWS configuration
 ./workbench/0-check-aws.sh
@@ -788,6 +791,7 @@ cat workbench/config.local.env
 ```
 
 #### **4. AWS Deployment**
+
 ```bash
 # Create S3 bucket (one-time setup)
 ./workbench/1-create-bucket.sh
@@ -800,6 +804,7 @@ cat workbench/config.local.env
 ```
 
 #### **5. Iteration & Updates**
+
 ```bash
 # Make code changes in src/main/bx/Lambda.bx
 # Run tests
@@ -813,6 +818,7 @@ cat workbench/config.local.env
 ```
 
 #### **6. Cleanup (when done)**
+
 ```bash
 # Remove all AWS resources
 ./workbench/4-cleanup.sh
@@ -821,6 +827,7 @@ cat workbench/config.local.env
 ### ⚡ **Quick Commands Reference**
 
 #### **Daily Development**
+
 ```bash
 ./gradlew runLocal                   # Test locally
 ./gradlew test                      # Run tests
@@ -828,6 +835,7 @@ cat workbench/config.local.env
 ```
 
 #### **AWS Operations**
+
 ```bash
 ./workbench/0-check-aws.sh          # Check AWS setup
 ./workbench/1-create-bucket.sh      # Create S3 bucket
@@ -837,6 +845,7 @@ cat workbench/config.local.env
 ```
 
 #### **Local Testing Options**
+
 ```bash
 ./gradlew runLocal                  # Default event
 ./gradlew runLocalApi              # API Gateway event
@@ -872,6 +881,7 @@ Apply this spacing standard to all BoxLang, Java, and configuration code in the 
 ### 🐛 Troubleshooting
 
 #### 🔧 **Build & Test Issues**
+
 | Problem | Solution |
 |---------|----------|
 | ❌ Tests fail with ClassNotFoundException | Check dependency resolution, run `./gradlew clean build` |
@@ -880,6 +890,7 @@ Apply this spacing standard to all BoxLang, Java, and configuration code in the 
 | ❌ Large deployment package | Review dependencies in `build.gradle`, exclude unnecessary JARs |
 
 #### ☁️ **AWS Deployment Issues**
+
 | Problem | Solution |
 |---------|----------|
 | ❌ AWS credentials not configured | Run `./workbench/0-check-aws.sh` for diagnosis |
@@ -888,6 +899,7 @@ Apply this spacing standard to all BoxLang, Java, and configuration code in the 
 | ❌ Lambda function not found | Verify `FUNCTION_NAME` in config matches deployed function |
 
 #### 🚀 **Lambda Runtime Issues**
+
 | Problem | Solution |
 |---------|----------|
 | ❌ Lambda timeout in AWS | Increase `LAMBDA_TIMEOUT` in config and redeploy |
@@ -896,6 +908,7 @@ Apply this spacing standard to all BoxLang, Java, and configuration code in the 
 | ❌ Module loading failures | Verify modules in `src/resources/boxlang_modules/` directory |
 
 #### 🛠️ **Quick Diagnosis Commands**
+
 ```bash
 # Check AWS configuration
 ./workbench/0-check-aws.sh
