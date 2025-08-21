@@ -1,9 +1,25 @@
 #!/bin/bash
 set -eo pipefail
-STACK=java17-examples
+
+# Load configuration if available
+if [ -f "config.local.env" ]; then
+    echo "📝 Loading configuration from config.local.env"
+    export $(grep -v '^#' config.local.env | xargs)
+elif [ -f "config.env" ]; then
+    echo "📝 Loading default configuration from config.env"
+    export $(grep -v '^#' config.env | xargs)
+fi
+
+# Set stack name from environment, argument, or use default
 if [[ $# -eq 1 ]] ; then
     STACK=$1
-    echo "Deleting stack $STACK"
+    echo "🗑️ Deleting stack $STACK (from argument)"
+elif [ "$STACK_NAME" ]; then
+    STACK="$STACK_NAME"
+    echo "🗑️ Deleting stack $STACK (from config)"
+else
+    STACK="boxlang-lambda-stack"
+    echo "🗑️ Deleting stack $STACK (default)"
 fi
 FUNCTION=$(aws cloudformation describe-stack-resource --stack-name $STACK --logical-resource-id function --query 'StackResourceDetail.PhysicalResourceId' --output text)
 aws cloudformation delete-stack --stack-name $STACK
