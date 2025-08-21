@@ -498,8 +498,10 @@ This creates a local HTTP endpoint at `http://localhost:3000` where you can:
 ```
 workbench/sampleEvents/
 ├── api.json         # API Gateway HTTP v2.0 event
-├── api-post.json    # POST request with JSON body
+├── api-post.json    # POST request with JSON body  
 ├── event.json       # Legacy API Gateway event
+├── event-live.json  # Production test payload (used by 3-invoke.sh)
+├── event-local.json # Local development test payload
 └── s3-event.json    # S3 bucket notification event
 ```
 
@@ -683,7 +685,167 @@ When you deploy, you'll see:
 ⚙️  Lambda Memory: 512MB, Timeout: 30s, Environment: production
 ```
 
-## 🔧 Development Tips
+## ⚙️ Configuration Reference
+
+### 📋 **Complete Configuration Variables**
+
+The template uses a hierarchical configuration system: `config.local.env` → `config.env` → environment variables
+
+#### **Required Settings**
+| Variable | Description | Example | Used By |
+|----------|-------------|---------|---------|
+| `AWS_LAMBDA_BUCKET` | S3 bucket for artifacts (globally unique) | `my-company-lambda-artifacts` | All deployment scripts |
+
+#### **Stack & Function Settings**
+| Variable | Default | Description | Used By |
+|----------|---------|-------------|---------|
+| `STACK_NAME` | `boxlang-lambda-stack` | CloudFormation stack name | `2-deploy.sh`, `4-cleanup.sh` |
+| `FUNCTION_NAME` | `{STACK_NAME}-bxFunction-{SUFFIX}` | Direct function name for invocation | `3-invoke.sh` |
+
+#### **Lambda Runtime Settings**
+| Variable | Default | Description | Constraints |
+|----------|---------|-------------|-------------|
+| `LAMBDA_MEMORY` | `128` | Memory allocation (MB) | 128-10240 MB |
+| `LAMBDA_TIMEOUT` | `15` | Timeout in seconds | 1-900 seconds |
+| `ENVIRONMENT` | `dev` | Deployment environment tag | dev/staging/prod |
+
+#### **AWS Settings**
+| Variable | Default | Description | Used By |
+|----------|---------|-------------|---------|
+| `AWS_REGION` | *your default* | AWS region for deployment | All AWS CLI operations |
+
+### 🔧 **Configuration Setup**
+
+#### **1. Copy Template**
+```bash
+cp workbench/config.env workbench/config.local.env
+```
+
+#### **2. Edit Your Settings**
+```bash
+# config.local.env (this file is gitignored)
+AWS_LAMBDA_BUCKET=my-unique-bucket-2024
+STACK_NAME=my-api-prod
+LAMBDA_MEMORY=256
+LAMBDA_TIMEOUT=30
+ENVIRONMENT=production
+```
+
+#### **3. Verify Configuration**
+```bash
+# Check if AWS is configured
+./workbench/0-check-aws.sh
+
+# Deploy with your config
+./workbench/2-deploy.sh
+```
+
+### 🎯 **Configuration Best Practices**
+
+- ✅ **Use `config.local.env`** - Keep your settings out of git
+- ✅ **Unique bucket names** - Include company/project prefix
+- ✅ **Environment-specific stacks** - `my-app-dev`, `my-app-prod`
+- ✅ **Resource sizing** - Start small, scale up based on needs
+- ✅ **Timeout alignment** - Match Lambda timeout with `boxlang.json` settings
+
+## � Complete Development Workflow
+
+### 📋 **From Zero to Deployed**
+
+#### **1. Initial Setup**
+```bash
+# Clone or download the template
+git clone <your-repo>
+cd boxlang-aws-lambda-template
+
+# Configure your deployment settings
+cp workbench/config.env workbench/config.local.env
+# Edit config.local.env with your AWS settings
+```
+
+#### **2. Development Cycle**
+```bash
+# Test locally during development
+./gradlew runLocal                    # Quick local test
+./gradlew test                       # Run full test suite
+
+# Test with HTTP endpoints (if SAM CLI installed)
+./gradlew startSamServerBackground   # Start local API server
+curl http://localhost:3000           # Test your endpoints
+./gradlew stopSamServer             # Stop when done
+```
+
+#### **3. Pre-Deployment Validation**
+```bash
+# Verify AWS configuration
+./workbench/0-check-aws.sh
+
+# Full build and test
+./gradlew clean build test
+
+# Verify your config
+cat workbench/config.local.env
+```
+
+#### **4. AWS Deployment**
+```bash
+# Create S3 bucket (one-time setup)
+./workbench/1-create-bucket.sh
+
+# Deploy to AWS Lambda
+./workbench/2-deploy.sh
+
+# Test deployed function
+./workbench/3-invoke.sh
+```
+
+#### **5. Iteration & Updates**
+```bash
+# Make code changes in src/main/bx/Lambda.bx
+# Run tests
+./gradlew test
+
+# Redeploy
+./gradlew build && ./workbench/2-deploy.sh
+
+# Test updated function
+./workbench/3-invoke.sh
+```
+
+#### **6. Cleanup (when done)**
+```bash
+# Remove all AWS resources
+./workbench/4-cleanup.sh
+```
+
+### ⚡ **Quick Commands Reference**
+
+#### **Daily Development**
+```bash
+./gradlew runLocal                   # Test locally
+./gradlew test                      # Run tests  
+./gradlew build                     # Build package
+```
+
+#### **AWS Operations**
+```bash
+./workbench/0-check-aws.sh          # Check AWS setup
+./workbench/1-create-bucket.sh      # Create S3 bucket
+./workbench/2-deploy.sh             # Deploy to AWS
+./workbench/3-invoke.sh             # Test deployed function
+./workbench/4-cleanup.sh            # Remove AWS resources
+```
+
+#### **Local Testing Options**
+```bash
+./gradlew runLocal                  # Default event
+./gradlew runLocalApi              # API Gateway event
+./gradlew runLocalLegacy           # Legacy API event
+./gradlew startSamServerBackground # HTTP server
+./gradlew stopSamServer           # Stop server
+```
+
+## �🔧 Development Tips
 
 ### 💡 Best Practices
 
@@ -709,12 +871,46 @@ Apply this spacing standard to all BoxLang, Java, and configuration code in the 
 
 ### 🐛 Troubleshooting
 
+#### 🔧 **Build & Test Issues**
 | Problem | Solution |
 |---------|----------|
 | ❌ Tests fail with ClassNotFoundException | Check dependency resolution, run `./gradlew clean build` |
-| ❌ Lambda timeout in AWS | Increase timeout in `template.yml` and `boxlang.json` |
-| ❌ Large deployment package | Review dependencies in `build.gradle`, exclude unnecessary JARs |
+| ❌ Gradle build fails | Ensure Java 21+ installed, run `./gradlew --version` |
 | ❌ BoxLang class not found | Check module paths in `src/resources/boxlang_modules/` |
+| ❌ Large deployment package | Review dependencies in `build.gradle`, exclude unnecessary JARs |
+
+#### ☁️ **AWS Deployment Issues**
+| Problem | Solution |
+|---------|----------|
+| ❌ AWS credentials not configured | Run `./workbench/0-check-aws.sh` for diagnosis |
+| ❌ S3 bucket already exists | Choose a globally unique bucket name in `config.local.env` |
+| ❌ CloudFormation deployment fails | Check AWS permissions, review stack events in AWS Console |
+| ❌ Lambda function not found | Verify `FUNCTION_NAME` in config matches deployed function |
+
+#### 🚀 **Lambda Runtime Issues**
+| Problem | Solution |
+|---------|----------|
+| ❌ Lambda timeout in AWS | Increase `LAMBDA_TIMEOUT` in config and redeploy |
+| ❌ Lambda memory errors | Increase `LAMBDA_MEMORY` in config and redeploy |
+| ❌ BoxLang initialization errors | Check `boxlang.json` configuration, enable `debugMode: true` |
+| ❌ Module loading failures | Verify modules in `src/resources/boxlang_modules/` directory |
+
+#### 🛠️ **Quick Diagnosis Commands**
+```bash
+# Check AWS configuration
+./workbench/0-check-aws.sh
+
+# Verify project build
+./gradlew clean build test
+
+# Test locally before deployment  
+./gradlew runLocal
+
+# Check deployed function
+aws lambda list-functions --query 'Functions[?contains(FunctionName, `boxlang`)].FunctionName'
+```
+
+> 📚 **Additional Help**: See `workbench/DEPLOYMENT.md` for detailed deployment troubleshooting
 
 ## Ortus Sponsors
 
