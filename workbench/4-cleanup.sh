@@ -21,9 +21,18 @@ else
     STACK="boxlang-lambda-stack"
     echo "🗑️ Deleting stack $STACK (default)"
 fi
-FUNCTION=$(aws cloudformation describe-stack-resource --stack-name $STACK --logical-resource-id function --query 'StackResourceDetail.PhysicalResourceId' --output text)
+
+# Set function name for log cleanup
+FUNCTION_NAME=${FUNCTION_NAME:-"$STACK-bxFunction-XXXXXXXXXX"}
+
+echo "⚠️  This will delete:"
+echo "   📦 CloudFormation Stack: $STACK"
+echo "   📋 Function Logs: /aws/lambda/$FUNCTION_NAME"
+echo "   🪣 S3 Bucket: (if created by this template)"
+echo ""
+
 aws cloudformation delete-stack --stack-name $STACK
-echo "Deleted $STACK stack."
+echo "✅ Deleted $STACK stack."
 
 if [ -f bucket-name.txt ]; then
     ARTIFACT_BUCKET=$(cat bucket-name.txt)
@@ -42,9 +51,9 @@ if [ -f bucket-name.txt ]; then
 fi
 
 while true; do
-    read -p "Delete function log group (/aws/lambda/$FUNCTION)? (y/n)" response
+    read -p "Delete function log group (/aws/lambda/$FUNCTION_NAME)? (y/n)" response
     case $response in
-        [Yy]* ) aws logs delete-log-group --log-group-name /aws/lambda/$FUNCTION; break;;
+        [Yy]* ) aws logs delete-log-group --log-group-name /aws/lambda/$FUNCTION_NAME; break;;
         [Nn]* ) break;;
         * ) echo "Response must start with y or n.";;
     esac

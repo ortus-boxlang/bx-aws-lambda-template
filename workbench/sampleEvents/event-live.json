@@ -1,0 +1,8 @@
+{
+	"event": "live-test",
+	"timestamp": "2025-08-21T00:00:00Z",
+	"data": {
+		"message": "Live Lambda invocation test",
+		"environment": "production"
+	}
+}

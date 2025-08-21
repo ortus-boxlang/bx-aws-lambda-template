@@ -192,7 +192,8 @@ task bumpPatchVersion {
 }
 
 /**
- * Run Lambda locally with default event
+ * Run Lambda locally with default event used for integration testing
+ * worbench/sampleEvents/event-local.json
  */
 task runLocal( type: JavaExec ) {
 	dependsOn compileTestJava
@@ -200,7 +201,7 @@ task runLocal( type: JavaExec ) {
 	mainClass = 'com.myproject.runner.LocalLambdaRunner'
 
 	// Set default event file
-	systemProperty 'eventFile', project.findProperty('eventFile') ?: 'workbench/event.json'
+	systemProperty 'eventFile', project.findProperty('eventFile') ?: 'workbench/sampleEvents/event-local.json'
 
 	// Force JVM exit after execution to prevent hanging
 	systemProperty 'java.awt.headless', 'true'

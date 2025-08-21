@@ -516,8 +516,8 @@ The `workbench/` directory provides complete deployment automation:
 
 | Script | Purpose | Requirements |
 |--------|---------|--------------|
-| 🪣 `1-create-bucket.sh` | Create S3 bucket for artifacts | AWS CLI configured |
-| 🚀 `2-deploy.sh` | Build & deploy via CloudFormation | S3 bucket exists |
+| 🪣 `1-create-bucket.sh` | Create S3 bucket for artifacts, skip if defined already | AWS CLI configured |
+| 🚀 `2-deploy.sh` | Build & Deploy via CloudFormation | S3 bucket must exist & AWS CLI Configured |
 | 📞 `3-invoke.sh` | Test deployed Lambda | Lambda deployed |
 | 🧹 `4-cleanup.sh` | Remove AWS resources | - |
 

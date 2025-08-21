@@ -44,7 +44,7 @@ public class LocalLambdaRunner {
 	public static void main( String[] args ) {
 		try {
 			// Get event file from system property or use default
-			String eventFile = System.getProperty( "eventFile", "workbench/event.json" );
+			String eventFile = System.getProperty( "eventFile", "workbench/sampleEvents/event-local.json" );
 
 			System.out.println( "🚀 BoxLang Lambda Local Runner" );
 			System.out.println( "📄 Loading event from: " + eventFile );
@@ -82,14 +82,22 @@ public class LocalLambdaRunner {
 		}
 	}
 
-	@SuppressWarnings( "unchecked" )
+	/**
+	 * Load the event data from a JSON file.
+	 *
+	 * @param eventFile The path to the event file.
+	 *
+	 * @return The event data as a Map.
+	 *
+	 * @throws IOException If an error occurs while reading the file.
+	 */
 	private static Map<String, Object> loadEventFromFile( String eventFile ) throws IOException {
 		Path eventPath = Paths.get( eventFile );
 
 		if ( !Files.exists( eventPath ) ) {
 			System.err.println( "❌ Event file not found: " + eventFile );
 			System.out.println( "💡 Available sample events:" );
-			System.out.println( "   - workbench/event.json (default Lambda event)" );
+			System.out.println( "   - workbench/sampleEvents/event-local.json (default Lambda event)" );
 			System.out.println( "   - workbench/sampleEvents/api.json (API Gateway event)" );
 			System.out.println( "   - workbench/sampleEvents/event.json (Legacy API Gateway)" );
 			System.exit( 1 );

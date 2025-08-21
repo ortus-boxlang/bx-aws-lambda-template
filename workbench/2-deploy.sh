@@ -23,15 +23,14 @@ fi
 # Set stack name from environment or use default
 STACK_NAME=${STACK_NAME:-"boxlang-lambda-stack"}
 
+# Set Lambda configuration from environment or use defaults
+LAMBDA_MEMORY=${LAMBDA_MEMORY:-128}
+LAMBDA_TIMEOUT=${LAMBDA_TIMEOUT:-15}
+ENVIRONMENT=${ENVIRONMENT:-"dev"}
+
 TEMPLATE=template.yml
 if [ $1 ]
 then
-  if [ $1 = mvn ]
-  then
-    TEMPLATE=template-mvn.yml
-    mvn package
-  fi
-else
   echo "🏗️ Building with Gradle..."
   gradle build -i
 fi
@@ -40,4 +39,13 @@ echo "📦 Packaging CloudFormation template..."
 aws cloudformation package --template-file $TEMPLATE --s3-bucket $ARTIFACT_BUCKET --output-template-file out.yml
 
 echo "🚀 Deploying to AWS CloudFormation stack: $STACK_NAME"
-aws cloudformation deploy --template-file out.yml --stack-name $STACK_NAME --capabilities CAPABILITY_NAMED_IAM
+echo "⚙️  Lambda Memory: ${LAMBDA_MEMORY}MB, Timeout: ${LAMBDA_TIMEOUT}s, Environment: $ENVIRONMENT"
+
+aws cloudformation deploy \
+    --template-file out.yml \
+    --stack-name $STACK_NAME \
+    --capabilities CAPABILITY_NAMED_IAM \
+    --parameter-overrides \
+        LambdaMemorySize=$LAMBDA_MEMORY \
+        LambdaTimeout=$LAMBDA_TIMEOUT \
+        Environment=$ENVIRONMENT
