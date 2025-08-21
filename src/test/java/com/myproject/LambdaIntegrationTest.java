@@ -54,12 +54,7 @@ public class LambdaIntegrationTest {
 	@DisplayName( "Test your Lambda.bx" )
 	@Test
 	public void testBasicExecution() throws IOException {
-		// Set a valid path
-		Path			validPath	= Path.of( "src", "main", "bx", "Lambda.bx" );
-		LambdaRunner	runner		= new LambdaRunner( validPath, true );
-		// Create a AWS Lambda Context
-		Context			context		= new TestContext();
-		var				event		= new HashMap<String, Object>();
+		var event = new HashMap<String, Object>();
 		// Add some mock data to the event
 		event.put( "name", "Ortus Solutions" );
 		event.put( "when", Instant.now().toString() );
