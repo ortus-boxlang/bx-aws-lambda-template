@@ -1,0 +1,36 @@
+{
+	"version": "2.0",
+	"routeKey": "POST /users",
+	"rawPath": "/users",
+	"rawQueryString": "",
+	"headers": {
+		"accept": "application/json",
+		"content-length": "85",
+		"content-type": "application/json",
+		"host": "api.example.com",
+		"user-agent": "PostmanRuntime/7.29.0",
+		"x-forwarded-for": "127.0.0.1",
+		"x-forwarded-port": "443",
+		"x-forwarded-proto": "https"
+	},
+	"requestContext": {
+		"accountId": "123456789012",
+		"apiId": "r3pmxmplak",
+		"domainName": "api.example.com",
+		"domainPrefix": "api",
+		"http": {
+			"method": "POST",
+			"path": "/users",
+			"protocol": "HTTP/1.1",
+			"sourceIp": "127.0.0.1",
+			"userAgent": "PostmanRuntime/7.29.0"
+		},
+		"requestId": "JKJaXmPLvHcESHA=",
+		"routeKey": "POST /users",
+		"stage": "$default",
+		"time": "10/Mar/2021:05:25:22 +0000",
+		"timeEpoch": 1615355122
+	},
+	"body": "{\"name\":\"John Doe\",\"email\":\"john@example.com\",\"role\":\"developer\"}",
+	"isBase64Encoded": false
+}

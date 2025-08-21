@@ -148,7 +148,7 @@ Your main Lambda logic goes in `src/main/bx/Lambda.bx`. The entry point **must**
  * Convention: run(event, context, response)
  */
 class {
-    function run(event, context, response) {
+    function run( event, context, response ) {
         response.body = {
             "error": false,
             "messages": [],
@@ -158,13 +158,11 @@ class {
     }
 
     // Alternative function (call with x-bx-function header)
-    function anotherFunction(event, context, response) {
+    function anotherFunction( event, context, response ) {
         return "Alternative lambda function!"
     }
 }
-```
-
-### 📋 Function Parameters
+```### 📋 Function Parameters
 
 - **`event`**: AWS Lambda event object (API Gateway, S3, etc.)
 - **`context`**: AWS Lambda context (`com.amazonaws.services.lambda.runtime.Context`)
@@ -187,7 +185,7 @@ class {
         return true;
     }
 
-    function onRequestStart(targetPage) {
+    function onRequestStart( targetPage ) {
         // Per-request initialization
         return true;
     }
@@ -310,6 +308,9 @@ build/distributions/your-lambda.zip
 | 📄 `jar` | Create standard JAR (without dependencies) | `build/libs/` |
 | 📚 `javadoc` | Generate Java API documentation | `build/docs/javadoc/` |
 | 🧪 `test` | Run JUnit tests | `build/reports/tests/` |
+| 🏠 `runLocal` | **Run Lambda locally with default event** | Console output |
+| 🌐 `runLocalApi` | **Run Lambda locally with API Gateway event** | Console output |
+| 🔧 `runLocalLegacy` | **Run Lambda locally with legacy API event** | Console output |
 | ✨ `spotlessApply` | Auto-format source code | - |
 | 🔍 `spotlessCheck` | Check code formatting | - |
 | 📋 `tasks` | List all available Gradle tasks | - |
@@ -378,6 +379,57 @@ public void testValidLambda() throws IOException {
 }
 ```
 
+### 🏠 Local Testing
+
+**NEW!** Test your Lambda locally without deploying to AWS:
+
+#### 🚀 Quick Local Testing
+
+```bash
+# Test locally with default event
+./gradlew runLocal
+
+# Test with API Gateway event
+./gradlew runLocalApi
+
+# Test with custom event file
+./gradlew runLocal -PeventFile=workbench/sampleEvents/s3-event.json
+```
+
+#### 🌐 SAM Local Development Server
+
+If you have [SAM CLI installed](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html):
+
+```bash
+# Start local API server (HTTP endpoint testing)
+./workbench/5-test-local.sh
+```
+
+This creates a local HTTP endpoint at `http://localhost:3000` where you can:
+
+- Send HTTP requests directly to your Lambda
+- Test API Gateway integration locally
+- Debug with hot reload capabilities
+
+#### 📁 Available Sample Events
+
+```
+workbench/sampleEvents/
+├── api.json         # API Gateway HTTP v2.0 event
+├── api-post.json    # POST request with JSON body
+├── event.json       # Legacy API Gateway event
+└── s3-event.json    # S3 bucket notification event
+```
+
+#### 🔧 Local Test Runner Features
+
+The built-in `LocalLambdaRunner` provides:
+- ⚡ **Fast execution** - No deployment required
+- 📊 **Performance metrics** - Shows execution time
+- 🔍 **JSON output formatting** - Pretty-printed responses
+- 📄 **Multiple event support** - Easy event switching
+- ❌ **Error handling** - Clear error messages with stack traces
+
 ## 🚀 AWS Deployment
 
 ### 🛠️ Deployment Scripts
@@ -427,6 +479,21 @@ aws lambda invoke --function-name your-function \
 - 🚀 **Use the wrapper** - Always use `./gradlew` (not `gradle`) for consistency
 - 📦 **Check your ZIP** - Verify `build/distributions/*.zip` contains expected files
 - 🔧 **Configure for production** - Set `trustedCache: true` in `boxlang.json`
+
+### 🎨 Code Formatting Standards
+
+**Spacing around symbols**: Always add spaces around parentheses `( )`, brackets `[ ]`, braces `{ }`, and operators for readability
+
+**Examples:**
+
+- ✅ `function run( event, context, response )`
+- ❌ `function run(event,context,response)`
+- ✅ `var results = [ 1, 2, 3 ]`
+- ❌ `var results = [1,2,3]`
+- ✅ `if ( condition ) { doSomething(); }`
+- ❌ `if(condition){doSomething();}`
+
+Apply this spacing standard to all BoxLang, Java, and configuration code in the project.
 
 ### 🐛 Troubleshooting
 

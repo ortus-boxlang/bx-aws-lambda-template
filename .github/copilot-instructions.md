@@ -58,6 +58,18 @@ This is a BoxLang AWS Lambda template that wraps a BoxLang runtime inside a Java
 2. If you add BoxLang modules, put them in `src/resources/boxlang_modules` or declare them in `box.json`.
 3. The BoxLang runtime is now a Maven dependency - no manual JAR download needed.
 
+## Code formatting standards
+
+- **Spacing around symbols**: Always add spaces around parentheses `( )`, brackets `[ ]`, braces `{ }`, and operators for readability
+- **Examples**:
+  - ✅ `function run( event, context, response )`
+  - ❌ `function run(event,context,response)`
+  - ✅ `var results = [ 1, 2, 3 ]`
+  - ❌ `var results = [1,2,3]`
+  - ✅ `if ( condition ) { doSomething(); }`
+  - ❌ `if(condition){doSomething();}`
+- Apply this spacing standard to all BoxLang, Java, and configuration code in the project
+
 ---
 
 If any section is unclear or you'd like additional examples (tests, a small local-run guide, or CI snippets), tell me which area and I will iterate.

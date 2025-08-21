@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: BoxLang Lambda Local Development Template
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: java21
+    Environment:
+      Variables:
+        TZ: UTC
+        BOXLANG_DEBUG: "false"
+
+Resources:
+  BoxLangFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../build/distributions/boxlang-aws-project-1.0.0.zip
+      Handler: ortus.boxlang.runtime.aws.LambdaRunner::handleRequest
+      Events:
+        # HTTP API Event for testing via SAM local
+        HttpApi:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+        # Direct Lambda invocation event
+        DirectInvoke:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+            Enabled: false
+
+Outputs:
+  BoxLangApi:
+    Description: "API Gateway endpoint URL for BoxLang function"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+  BoxLangFunction:
+    Description: "BoxLang Lambda Function ARN"
+    Value: !GetAtt BoxLangFunction.Arn
+  BoxLangFunctionIamRole:
+    Description: "Implicit IAM Role created for BoxLang function"
+    Value: !GetAtt BoxLangFunctionRole.Arn
