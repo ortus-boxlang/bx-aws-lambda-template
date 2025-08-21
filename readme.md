@@ -1,4 +1,4 @@
-# ⚡︎ BoxLang Module: MyLambdaProject
+# ⚡ BoxLang AWS Lambda Template
 
 ```
 |:------------------------------------------------------:|
@@ -16,98 +16,426 @@
 
 <p>&nbsp;</p>
 
-This template allows you to build BoxLang Lambda projects that you can deploy to AWS Lambdas.  This template leverages CommandBox and Gradle for the build process and dependencies.  If your lambda leverages Java libraries, then add them to the `build.gradle` file.  If your lambda leverages BoxLang libraries, then add them to the `box.json` file.
+🚀 **Production-ready template** for building and deploying BoxLang applications to AWS Lambda. This template provides a complete Java-BoxLang hybrid runtime with Gradle build automation, comprehensive testing, and AWS SAM deployment scripts.
 
-The main lambda code is located in the `src/main/bx/Lambda.bx` folder and the test code is located in the `src/test/java/com/myproject` folder.
+## 🏗️ Architecture Overview
 
-## Directory Structure
-
-Here is a brief overview of the directory structure:
-
-* `build` - This is a temporary non-sourced folder that contains the build assets for the module that gradle produces
-* `gradle` - The gradle wrapper and configuration, goes into source control don't remove
-* `src` - Where your module source code lives
-* `workbench` - The workbench for your module including several Lambda resources
-* `.cfformat.json` - A CFFormat using the Ortus Standards
-* `.editorconfig` - Smooth consistency between editors
-* `.gitattributes` - Git attributes
-* `.gitignore` - Basic ignores. Modify as needed.
-* `.markdownlint.json` - A linting file for markdown docs
-* `.ortus-java-style.xml` - Ortus Java Style for IntelliJ, VScode, Eclipse.
-* `box.json` - The box.json for your dependencies or if you want to publish to ForgeBox
-* `build.gradle` - The gradle build file for the project.
-* `changelog.md` - A nice changelog tracking file
-* `gradlew` - The gradle wrapper, don't remove
-* `gradlew.bat` - The gradle wrapper for windows, don't remove
-* `settings.gradle` - The gradle settings file
-
-### Source Directory
-
-Here is a brief overview of the `src` directory structure:
-
-* `main` - Gradle source set for main code
-  * `bx` - The BoxLang source code
-    * `Application.bx` - The main application file that is executed when the lambda is invoked
-    * `Lambda.bx` - Your lambda code to deploy
-    * Any other BoxLang code you need
-* `test`
-  * `java` - Java test code for the lambda just like if you were running it in AWS
-   	* `com` - Your package
-   	  * `myproject` - Your project package
-        * `LambdaRunnerTest.java` - Your test code for the lambda
-  * `resources` - Resources for testing
-    * `boxlang.json` - Custom BoxLang configuration for the lambda
-    * `libs` - BoxLang binary goes here for now.
-    * `boxlang_modules` - BoxLang modules that will be packaged with the lambda (Not in source control)
-
-## Project Properties
-
-The project name is defined in the `settings.gradle` file.  You can change it there.
-The project version, BoxLang Version and JDK version is defined in the `build.gradle` file.  You can change it there.
-
-## BoxLang Modules
-
-If you would like your Lambda to use modules, you can do so by installing them at the `src/resources/boxlang_modules` folder.  This is where you can place your BoxLang modules that you want to package with your Lambda.  You can also use the `box.json` file to define your dependencies and modules and making sure the installation path is set to `src/resources/boxlang_modules`.  This will ensure that the modules are packaged with your Lambda when you build it.
-
-## Gradle Tasks
-
-Before you get started, you need to run the `downloadBoxLang` task in order to download the latest BoxLang binary until we publish to Maven.
-
-```bash
-gradle downloadBoxLang
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   AWS Lambda    │    │  LambdaRunner    │    │  BoxLang App    │
+│    Runtime      │───▶│  (Java Wrapper)  │───▶│  (Lambda.bx)    │
+│   (Java 21)     │    │                  │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+  Handler Invocation    Event Processing        Business Logic
+  Context Management    Response Formatting     Application Lifecycle
 ```
 
-This will store the binary under `/src/test/resources/libs` for you to use in your tests and compiler.  Then you can create your Lambda.  Once you are ready you can run the following to create the final zip to deploy to AWS.
+**Key Components:**
 
-```bash
-gradle build
+- 📦 **BoxLang Runtime**: Maven dependency `io.boxlang:boxlang-aws-lambda:1.4.0`
+- 🎯 **Lambda Handler**: `ortus.boxlang.runtime.aws.LambdaRunner::handleRequest`
+- 📝 **BoxLang Code**: Lives in `src/main/bx/` (Lambda.bx, Application.bx)
+- ⚙️ **Java Wrapper**: Gradle build system with shadow JAR packaging
+- 🏗️ **Deployment**: ZIP artifact for AWS Lambda with SAM template
+
+The main lambda code is located in `src/main/bx/Lambda.bx` and the test code is located in `src/test/java/com/myproject`.
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- ☕ **Java 21+** (required for runtime)
+- 🔧 **AWS CLI** (for deployment)
+- 🏗️ **SAM CLI** (optional, for local testing)
+
+### Get Started in 2 Steps
+
+1. **🧪 Run tests to verify setup:**
+
+   ```bash
+   ./gradlew test
+   ```
+
+2. **📦 Build deployment package:**
+
+   ```bash
+   ./gradlew build
+   ```
+
+Your deployable ZIP will be created at `build/distributions/boxlang-aws-project-<version>.zip`
+
+### 🔥 Deploy to AWS
+
+1. **Create S3 bucket for artifacts:**
+
+   ```bash
+   ./workbench/1-create-bucket.sh
+   ```
+
+2. **Deploy via SAM:**
+
+   ```bash
+   ./workbench/2-deploy.sh
+   ```
+
+3. **Invoke your Lambda:**
+
+   ```bash
+   ./workbench/3-invoke.sh
+   ```
+
+## 📁 Directory Structure
+
+Here is a comprehensive overview of the project structure:
+
+### 🗂️ Root Files & Folders
+
+- `build/` - Temporary build assets (generated by Gradle)
+- `gradle/` - Gradle wrapper and configuration
+- `src/` - Your module source code
+- `workbench/` - AWS deployment scripts and SAM template
+- `.cfformat.json` - CFFormat configuration (Ortus Standards)
+- `.editorconfig` - Editor consistency settings
+- `.gitattributes` - Git attributes
+- `.gitignore` - Git ignore patterns
+- `.markdownlint.json` - Markdown linting rules
+- `.ortus-java-style.xml` - Java style guide (IntelliJ/VSCode/Eclipse)
+- `box.json` - BoxLang dependencies and ForgeBox metadata
+- `build.gradle` - Gradle build configuration
+- `changelog.md` - Version history tracking
+- `gradlew` - Gradle wrapper (Linux/macOS)
+- `gradlew.bat` - Gradle wrapper (Windows)
+- `settings.gradle` - Gradle project settings
+
+### 📂 Source Directory (`src/`)
+
+- 📝 **`main/`** - Production source code
+  - 🎯 `bx/` - BoxLang source files
+    - 🏠 `Application.bx` - Application lifecycle hooks and configuration
+    - ⚡ `Lambda.bx` - **Your Lambda entry point** (implements `run(event, context, response)`)
+    - 📄 _(Add your BoxLang classes here)_
+- 🧪 **`test/`** - Test source code
+  - ☕ `java/com/myproject/` - JUnit test classes
+    - 🎯 `LambdaRunnerTest.java` - Main Lambda integration tests
+    - 🔧 `TestContext.java` - Mock AWS Lambda Context
+    - 📝 `TestLogger.java` - Test logging utilities
+- 🗂️ **`resources/`** - Runtime resources
+  - ⚙️ `boxlang.json` - BoxLang runtime configuration
+  - 📦 `boxlang_modules/` - Local BoxLang modules (auto-packaged)
+  - 🔧 `libs/` - Any non-maven managed Jars that you want to include in your project
+
+### 🔬 Workbench Directory (`workbench/`)
+
+- 🪣 `1-create-bucket.sh` - Creates S3 bucket for deployment artifacts
+- 🚀 `2-deploy.sh` - Builds and deploys Lambda via SAM/CloudFormation
+- 📞 `3-invoke.sh` - Invokes deployed Lambda with test payloads
+- 🧹 `4-cleanup.sh` - Cleanup deployment resources
+- 📋 `template.yml` - **SAM template** for AWS Lambda deployment
+- 📄 `event.json` - Sample Lambda event for testing
+- 📁 `sampleEvents/` - Additional sample events (API Gateway, etc.)
+
+## 💻 Lambda Development Guide
+
+### 🎯 Writing Your Lambda Function
+
+Your main Lambda logic goes in `src/main/bx/Lambda.bx`. The entry point **must** be named `run`:
+
+```boxlang
+/**
+ * Lambda Entry Point
+ * Convention: run(event, context, response)
+ */
+class {
+    function run(event, context, response) {
+        response.body = {
+            "error": false,
+            "messages": [],
+            "data": "Hello from BoxLang Lambda! Event: " & event.toString()
+        }
+        response.statusCode = 200
+    }
+
+    // Alternative function (call with x-bx-function header)
+    function anotherFunction(event, context, response) {
+        return "Alternative lambda function!"
+    }
+}
 ```
 
-This will create a `build/distributions` folder with the final zip file to deploy to AWS.
+### 📋 Function Parameters
 
-### Basic Tasks
+- **`event`**: AWS Lambda event object (API Gateway, S3, etc.)
+- **`context`**: AWS Lambda context (`com.amazonaws.services.lambda.runtime.Context`)
+- **`response`**: Response object with standard structure:
+  - `statusCode` - HTTP status (default: 200)
+  - `headers` - HTTP headers map/struct
+  - `body` - Response payload (your data goes here)
+  - `cookies` - Array of response cookies
 
-Here are some basic tasks
+### 🔧 Application Lifecycle
 
-| Task                | Description                                                                                                        	|
-|---------------------|---------------------------------------------------------------------------------------------------------------------|
-| `build`             | The default lifecycle task that triggers the build process, including tasks like `clean`, `assemble`, and others. 	|
-| `clean`             | Deletes the `build` folders. It helps ensure a clean build by removing any previously generated artifacts.			|
-| `compileJava`       | Compiles Java source code files located in the `src/main/java` directory											|
-| `compileTestJava`   | Compiles Java test source code files located in the `src/test/java` directory										|
-| `dependencyUpdates` | Checks for updated versions of all dependencies															 			|
-| `downloadBoxLang`   | Downloads the latest BoxLang binary for testing																		|
-| `jar`               | Packages your project's compiled classes and resources into a JAR file `build/libs` folder							|
-| `javadoc`           | Generates the Javadocs for your project and places them in the `build/docs/javadoc` folder							|
-| `serviceLoader`     | Generates the ServiceLoader file for your project																	|
-| `spotlessApply`     | Runs the Spotless plugin to format the code																			|
-| `spotlessCheck`     | Runs the Spotless plugin to check the formatting of the code														|
-| `tasks`			  | Show all the available tasks in the project																			|
-| `test`              | Executes the unit tests in your project and produces the reports in the `build/reports/tests` folder				|
+Use `src/main/bx/Application.bx` for initialization and request processing:
 
-## Tests
+```boxlang
+class {
+    this.name = "My-AWS-Lambda"
 
-Please use the `src/test` folder for your unit tests.  You can either test using TestBox o JUnit if it's Java.
+    function onApplicationStart() {
+        // Initialize databases, caches, etc.
+        return true;
+    }
+
+    function onRequestStart(targetPage) {
+        // Per-request initialization
+        return true;
+    }
+}
+```
+
+## ⚙️ Configuration
+
+### 🔧 Project Properties
+
+**Project Name**: Defined in `settings.gradle`
+```gradle
+rootProject.name = 'boxlang-aws-project'
+```
+
+**Versions**: Configured in `gradle.properties` and `build.gradle`
+```properties
+# gradle.properties
+version=1.0.0
+jdkVersion=21
+boxlangVersion=1.0.0
+```
+
+### 🎛️ BoxLang Runtime Configuration
+
+Configure BoxLang behavior in `src/resources/boxlang.json`:
+
+```jsonc
+{
+  "debugMode": false,          // Enable for development
+  "trustedCache": true,        // Enable for production
+  "requestTimeout": "0,0,15,0", // 15 minute timeout (matches AWS Lambda)
+  "timezone": "${env:TZ:UTC}",  // Use TZ environment variable or UTC
+  "logging": {
+    "rootLevel": "WARN",       // ERROR, WARN, INFO, DEBUG, TRACE
+    "loggers": {
+      "runtime": { "level": "INFO", "appender": "console" }
+    }
+  }
+}
+```
+
+**Key Settings for AWS Lambda:**
+- 🔒 **`trustedCache: true`** - Enables class caching (recommended for production)
+- 🕐 **`requestTimeout`** - Should match your Lambda timeout
+- 🌍 **`timezone`** - Use `${env:TZ:UTC}` to respect Lambda environment
+- 📝 **`logging.*.appender: "console"`** - Required for CloudWatch logs
+
+## 📦 BoxLang Modules
+
+### 🔌 Adding Modules
+
+**Method 1: Direct Installation**
+```bash
+# Install to src/resources/boxlang_modules/
+box install moduleName --save --production --directory=src/resources/boxlang_modules
+```
+
+**Method 2: Via box.json**
+```jsonc
+{
+  "dependencies": {
+    "cborm": "^3.0.0",
+    "coldbox": "^6.0.0"
+  },
+  "installPaths": {
+    "coldbox": "src/resources/boxlang_modules/coldbox",
+    "cborm": "src/resources/boxlang_modules/cborm"
+  }
+}
+```
+
+Then run:
+```bash
+box install --production
+```
+
+### 📂 Module Structure
+
+Modules are automatically packaged into your deployment ZIP:
+```
+build/distributions/your-lambda.zip
+├── Lambda.bx
+├── boxlang.json
+├── lib/
+│   └── (jars)
+└── boxlang_modules/          # ← Your modules go here
+    ├── coldbox/
+    └── cborm/
+```
+
+## 🔨 Build System & Tasks
+
+### 🚀 Essential Commands
+
+**Development Workflow:**
+
+```bash
+# 1. Run tests
+./gradlew test
+
+# 2. Build deployment package
+./gradlew build
+
+# 3. Deploy to AWS
+./workbench/2-deploy.sh
+```
+
+### 📋 All Available Tasks
+
+| Task | Description | Output |
+|------|-------------|---------|
+| 🏗️ `build` | Full build lifecycle (clean, compile, test, package) | `build/distributions/*.zip` |
+| 🧹 `clean` | Delete build artifacts and temporary files | - |
+| ☕ `compileJava` | Compile Java source files | `build/classes/java/main/` |
+| 🧪 `compileTestJava` | Compile Java test files | `build/classes/java/test/` |
+| 📊 `dependencyUpdates` | Check for newer dependency versions | Console report |
+| 🔗 `shadowJar` | Create uber-JAR with all dependencies | `build/distributions/` |
+| 🎁 `buildLambdaZip` | Package Lambda deployment ZIP | `build/distributions/*.zip` |
+| 📄 `jar` | Create standard JAR (without dependencies) | `build/libs/` |
+| 📚 `javadoc` | Generate Java API documentation | `build/docs/javadoc/` |
+| 🧪 `test` | Run JUnit tests | `build/reports/tests/` |
+| ✨ `spotlessApply` | Auto-format source code | - |
+| 🔍 `spotlessCheck` | Check code formatting | - |
+| 📋 `tasks` | List all available Gradle tasks | - |
+
+### 🎯 Key Build Outputs
+
+```
+build/distributions/
+├── boxlang-aws-project-1.0.0.zip     # 🚀 Deploy this to AWS Lambda
+├── boxlang-aws-project-1.0.0-all.jar # 📦 Shadow JAR (uber-JAR)
+└── boxlang-aws-project-1.0.0/        # 📁 Unpacked contents
+    ├── Lambda.bx                      # Your BoxLang entry point
+    ├── boxlang.json                   # Runtime configuration
+    ├── lib/                          # All Java dependencies
+    └── boxlang_modules/              # BoxLang modules
+```
+
+## 🧪 Testing
+
+### 🎯 Test Structure
+
+```
+src/test/java/com/myproject/
+├── LambdaRunnerTest.java    # Main integration tests
+├── TestContext.java         # Mock AWS Lambda Context
+└── TestLogger.java          # Test logging utilities
+```
+
+### ✅ Running Tests
+
+```bash
+# Run all tests
+./gradlew test
+
+# Run specific test class
+./gradlew test --tests "com.myproject.LambdaRunnerTest"
+
+# Run with detailed output
+./gradlew test --info
+```
+
+### 📊 Test Reports
+
+After running tests, view results at:
+
+- 📄 **HTML Report**: `build/reports/tests/test/index.html`
+- 📊 **XML Results**: `build/test-results/test/`
+
+### 🧪 Sample Test
+
+```java
+@Test
+@DisplayName("Test Lambda.bx execution")
+public void testValidLambda() throws IOException {
+    Path validPath = Path.of("src", "main", "bx", "Lambda.bx");
+    LambdaRunner runner = new LambdaRunner(validPath, true);
+    Context context = new TestContext();
+
+    var event = new HashMap<String, Object>();
+    event.put("name", "Ortus Solutions");
+    event.put("when", Instant.now().toString());
+
+    IStruct response = runner.handleRequest(event, context);
+
+    assertThat(response.getAsInteger(Key.of("statusCode"))).isEqualTo(200);
+}
+```
+
+## 🚀 AWS Deployment
+
+### 🛠️ Deployment Scripts
+
+The `workbench/` directory provides complete deployment automation:
+
+| Script | Purpose | Requirements |
+|--------|---------|--------------|
+| 🪣 `1-create-bucket.sh` | Create S3 bucket for artifacts | AWS CLI configured |
+| 🚀 `2-deploy.sh` | Build & deploy via CloudFormation | S3 bucket exists |
+| 📞 `3-invoke.sh` | Test deployed Lambda | Lambda deployed |
+| 🧹 `4-cleanup.sh` | Remove AWS resources | - |
+
+### 📋 SAM Template
+
+The deployment uses `workbench/template.yml`:
+
+```yaml
+Resources:
+  bxFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build/distributions/boxlang-aws-project-1.0.0.zip
+      Handler: ortus.boxlang.runtime.aws.LambdaRunner::handleRequest
+      Runtime: java21
+      Timeout: 15
+      MemorySize: 128
+```
+
+### 🎯 Testing Your Deployed Lambda
+
+```bash
+# Test with default event
+./workbench/3-invoke.sh
+
+# Test with custom payload
+aws lambda invoke --function-name your-function \
+  --payload '{"name":"test","data":"hello"}' \
+  response.json && cat response.json
+```
+
+## 🔧 Development Tips
+
+### 💡 Best Practices
+
+- 🧪 **Test locally before deploying** - Use `./gradlew test` to catch issues early
+- 🚀 **Use the wrapper** - Always use `./gradlew` (not `gradle`) for consistency
+- 📦 **Check your ZIP** - Verify `build/distributions/*.zip` contains expected files
+- 🔧 **Configure for production** - Set `trustedCache: true` in `boxlang.json`
+
+### 🐛 Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| ❌ Tests fail with ClassNotFoundException | Check dependency resolution, run `./gradlew clean build` |
+| ❌ Lambda timeout in AWS | Increase timeout in `template.yml` and `boxlang.json` |
+| ❌ Large deployment package | Review dependencies in `build.gradle`, exclude unnecessary JARs |
+| ❌ BoxLang class not found | Check module paths in `src/resources/boxlang_modules/` |
 
 ## Ortus Sponsors
 

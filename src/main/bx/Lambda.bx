@@ -5,6 +5,7 @@
  * - You can create other functions and use the `x-bx-function` header to call them
  *
  * <h2>Arguments</h2>
+ *
  * - event: The event struct/map that triggered the Lambda
  * - context: The AWS Lambda context object that adheres to the <code>com.amazonaws.services.lambda.runtime.Context</code>
  * - response: The response object that will be returned to the caller which always has a standard structure:
