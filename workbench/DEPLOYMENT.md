@@ -11,6 +11,7 @@ cp workbench/config.env workbench/config.local.env
 ```
 
 Edit `workbench/config.local.env`:
+
 ```bash
 # Required: Your S3 bucket name (must be globally unique)
 AWS_LAMBDA_BUCKET=my-company-boxlang-artifacts
@@ -41,23 +42,27 @@ AWS_REGION=us-west-2
 ### 🪣 **Bucket Name Options (pick one):**
 
 **Option 1: Configuration File** (Recommended)
+
 ```bash
 # In workbench/config.local.env
 AWS_LAMBDA_BUCKET=my-boxlang-artifacts
 ```
 
 **Option 2: Command Line**
+
 ```bash
 ./workbench/1-create-bucket.sh my-boxlang-artifacts
 ```
 
 **Option 3: Environment Variable**
+
 ```bash
 export AWS_LAMBDA_BUCKET=my-boxlang-artifacts
 ./workbench/1-create-bucket.sh
 ```
 
 **Option 4: Auto-generated** (Default)
+
 ```bash
 # No configuration = random bucket name like "lambda-artifacts-a1b2c3d4"
 ./workbench/1-create-bucket.sh
@@ -76,6 +81,7 @@ export AWS_LAMBDA_BUCKET=my-boxlang-artifacts
 ## Corporate/Team Usage
 
 ### Shared Bucket Strategy
+
 ```bash
 # Team shares one artifacts bucket
 AWS_LAMBDA_BUCKET=company-lambda-artifacts
@@ -86,6 +92,7 @@ STACK_NAME=myapp-dev-jane
 ```
 
 ### CI/CD Integration
+
 ```bash
 # In your CI/CD pipeline
 export AWS_LAMBDA_BUCKET=company-cicd-artifacts
