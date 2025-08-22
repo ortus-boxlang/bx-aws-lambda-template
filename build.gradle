@@ -82,7 +82,6 @@ shadowJar {
 	mergeServiceFiles()
     destinationDirectory = file( "build/distributions" )
 }
-build.finalizedBy( shadowJar )
 
 /**
  * Build the Lambda zip file for deployment on AWS
