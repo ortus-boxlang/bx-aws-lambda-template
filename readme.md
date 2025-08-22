@@ -310,7 +310,9 @@ Configure BoxLang behavior in `src/resources/boxlang.json`:
 
 ### 🔌 Adding Modules
 
-**Method 1: Direct Installation**
+**Method 1: CommandBox CLI**
+
+You can leverage the CommandBox CLI to install BoxLang modules easily.
 
 ```bash
 # Install to src/resources/boxlang_modules/
@@ -319,15 +321,17 @@ box install {moduleName} --production --directory=src/resources/boxlang_modules
 
 **Method 2: Via box.json**
 
+CommandBox will read your `box.json` file for module dependencies.  This is a durable way to manage your dependencies.
+
 ```jsonc
 {
   "dependencies": {
-    "cborm": "^3.0.0",
-    "coldbox": "^6.0.0"
+    "bx-pdf": "^1.0.0",
+	"bx-mysql": "^1.0.0"
   },
   "installPaths": {
-    "coldbox": "src/resources/boxlang_modules/coldbox",
-    "cborm": "src/resources/boxlang_modules/cborm"
+    "bx-pdf": "src/resources/boxlang_modules/bx-pdf",
+	"bx-mysql": "src/resources/boxlang_modules/bx-mysql"
   }
 }
 ```
@@ -336,6 +340,17 @@ Then run:
 
 ```bash
 box install --production
+```
+
+Remember that these dependencies should not be added to your source control (e.g., Git).
+
+**Method 3: BoxLang Module Installer**
+
+The BoxLang module installer is an OS level CLI tool that is used to install modules easily without CommandBox.  Eventually, this tool and CommandBox will merge, but it is here for reference.
+
+```bash
+cd src/resources
+install-bx-module <module-name> --local
 ```
 
 ### 📂 Module Structure
@@ -349,8 +364,8 @@ build/distributions/your-lambda.zip
 ├── lib/
 │   └── (jars)
 └── boxlang_modules/          # ← Your modules go here
-    ├── coldbox/
-    └── cborm/
+    ├── bx-pdf/
+    └── bx-mysql/
 ```
 
 ## 🔨 Build System & Tasks
