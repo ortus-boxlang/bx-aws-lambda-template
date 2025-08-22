@@ -9,7 +9,6 @@ on:
 
 env:
     JDK_VERSION: 21
-    GRADLE_VERSION: 8.7
 
 jobs:
   tests:
@@ -28,15 +27,9 @@ jobs:
           distribution: "temurin"
           java-version: ${{ env.JDK_VERSION }}
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
-
       - name: Test Lambda
         run: |
-          gradle downloadBoxLang
-          gradle test --stacktrace --console=plain
+          ./gradlew test --stacktrace --console=plain
 
       - name: Upload Test Results
         if: always()

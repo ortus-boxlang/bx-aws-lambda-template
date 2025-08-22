@@ -24,7 +24,6 @@ on:
 env:
   SNAPSHOT: ${{ inputs.snapshot || false }}
   JDK_VERSION: 21
-  GRADLE_VERSION: 8.7
   BUILD_ID: ${{ github.run_number }}
 
 jobs:
@@ -52,11 +51,6 @@ jobs:
         with:
           distribution: "temurin"
           java-version: ${{ env.JDK_VERSION }}
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
 
       - name: Setup Environment Variables For Build Process
         id: current_version
@@ -91,8 +85,7 @@ jobs:
         run: |
           npm install -g markdownlint-cli
           markdownlint changelog.md --fix
-          gradle downloadBoxLang
-          gradle build -x test --stacktrace --console=plain
+          ./gradlew build -x test --stacktrace --console=plain
 
       - name: Commit Changelog [unreleased] with latest version
         uses: EndBug/add-and-commit@v9.1.4
