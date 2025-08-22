@@ -132,7 +132,124 @@ This will:
 
 > 💡 **Pro Tip**: The deployment scripts automatically use your configuration from `config.local.env` → `config.env` → environment variables and the workbench/sampleEvents/event-live.json
 
-## 📁 Directory Structure
+## � CI/CD Workflows
+
+This template includes **complete GitHub Actions workflows** for automated testing, building, and deployment. All workflows are production-ready and can be used immediately.
+
+### 📋 Available Workflows
+
+#### 🧪 **Test Workflow** (`.github/workflows/tests.yml`)
+
+**Purpose**: Reusable testing workflow with comprehensive validation
+
+**Features**:
+
+- ☕ **Java 21** setup with caching
+- 🔍 **Full test suite** execution via Gradle
+- 📊 **Test reports** as workflow artifacts
+- 🔄 **Reusable** across multiple workflows
+
+**Usage**: Automatically called by other workflows or can be triggered manually
+
+#### 🚀 **Release Workflow** (`.github/workflows/release.yml`)
+
+**Purpose**: Complete build, test, and optional AWS deployment pipeline
+
+**Features**:
+
+- 🏗️ **Full build** with shadow JAR and Lambda ZIP creation
+- 🧪 **Test execution** via reusable test workflow
+- 📦 **Build artifacts** uploaded (ZIP, JAR, test reports)
+- 🔧 **AWS Lambda deployment** (commented out, ready to enable)
+- 📤 **S3 distribution upload** (commented out, ready to enable)
+- 🏷️ **GitHub release creation** (commented out, ready to enable)
+
+**Triggers**:
+
+- Push to `main` branch
+- Manual workflow dispatch
+
+**💡 AWS Deployment**: Ready-to-use Lambda function updates:
+
+```yaml
+# Uncomment these lines in .github/workflows/release.yml for AWS deployment:
+
+- name: Update AWS Lambda Function
+  uses: kazimanzurrashid/aws-lambda-update-action@v2.0.3
+  with:
+    zip-file: "./build/distributions/${{ env.PROJECT_NAME }}-${{ env.VERSION }}.zip"
+    lambda-name: ${{ env.PROJECT_NAME }}-${{ env.DEPLOY_TIER }}
+  env:
+    AWS_REGION: ${{ secrets.AWS_REGION }}
+    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PUBLISHER_KEY_ID }}
+    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_PUBLISHER_KEY }}
+```
+
+> ⚠️ **Important**: You must create the Lambda function FIRST (using the workbench scripts), then uncomment the AWS deployment workflow to enable automatic function updates on releases.
+
+#### 📸 **Snapshot Workflow** (`.github/workflows/snapshot.yml`)
+
+**Purpose**: Development builds and testing for non-release branches
+
+**Features**:
+
+- 🔧 **Development builds** with snapshot versioning
+- 🧪 **Test execution** for validation
+- 📦 **Snapshot artifacts** for testing
+- 🌿 **Branch-based** development workflow
+
+**Triggers**:
+
+- Push to any branch except `main`
+- Pull requests
+
+### 🛠️ Setting Up CI/CD
+
+#### **1. GitHub Secrets (for AWS deployment)**
+
+Add these secrets to your GitHub repository (Settings → Secrets and variables → Actions):
+
+```bash
+AWS_REGION                    # e.g., us-east-1
+AWS_PUBLISHER_KEY_ID         # AWS Access Key ID
+AWS_SECRET_PUBLISHER_KEY     # AWS Secret Access Key
+```
+
+#### **2. Enable AWS Deployment**
+
+1. **Deploy function first** using workbench scripts:
+
+   ```bash
+   ./workbench/1-create-bucket.sh
+   ./workbench/2-deploy.sh
+   ```
+
+2. **Uncomment AWS deployment** in `.github/workflows/release.yml`
+
+3. **Push to main** or trigger workflow manually
+
+#### **3. Workflow Architecture**
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  Push to main   │    │  Release Flow   │    │  AWS Lambda     │
+│  (or manual)    │───▶│   • Build       │───▶│   • Update      │
+│                 │    │   • Test        │    │   • Deploy      │
+└─────────────────┘    │   • Package     │    └─────────────────┘
+                       └─────────────────┘
+                               │
+                               ▼
+                       ┌─────────────────┐
+                       │   Artifacts     │
+                       │   • Lambda ZIP  │
+                       │   • Shadow JAR  │
+                       │   • Test Reports│
+                       └─────────────────┘
+```
+
+> 🎯 **Pro Tip**: The workflows are designed for zero-configuration operation. Just create your GitHub repository, add AWS secrets if needed, and push code. The CI/CD pipeline handles the rest!
+
+## �📁 Directory Structure
 
 Here is a comprehensive overview of the project structure:
 

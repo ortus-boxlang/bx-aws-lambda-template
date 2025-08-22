@@ -113,15 +113,15 @@ jobs:
             build/reports/tests/**
             changelog.md
 
-      - name: Update AWS Lambda Function
-        uses: kazimanzurrashid/aws-lambda-update-action@v2.0.3
-        with:
-          zip-file: "./build/distributions/${{ env.PROJECT_NAME }}-${{ env.VERSION }}.zip"
-          lambda-name: ${{ env.PROJECT_NAME }}-${{ env.DEPLOY_TIER }}
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PUBLISHER_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_PUBLISHER_KEY }}
+      # - name: Update AWS Lambda Function
+      #   uses: kazimanzurrashid/aws-lambda-update-action@v2.0.3
+      #   with:
+      #     zip-file: "./build/distributions/${{ env.PROJECT_NAME }}-${{ env.VERSION }}.zip"
+      #     lambda-name: ${{ env.PROJECT_NAME }}-${{ env.DEPLOY_TIER }}
+      #   env:
+      #     AWS_REGION: ${{ secrets.AWS_REGION }}
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PUBLISHER_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_PUBLISHER_KEY }}
 
       # - name: Upload Distributions to S3
       #   uses: jakejarvis/s3-sync-action@master
