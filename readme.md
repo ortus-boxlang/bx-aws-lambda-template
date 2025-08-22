@@ -132,7 +132,7 @@ This will:
 
 > 💡 **Pro Tip**: The deployment scripts automatically use your configuration from `config.local.env` → `config.env` → environment variables and the workbench/sampleEvents/event-live.json
 
-## � CI/CD Workflows
+## 🤖 CI/CD Workflows
 
 This template includes **complete GitHub Actions workflows** for automated testing, building, and deployment. All workflows are production-ready and can be used immediately.
 
@@ -249,11 +249,9 @@ AWS_SECRET_PUBLISHER_KEY     # AWS Secret Access Key
 
 > 🎯 **Pro Tip**: The workflows are designed for zero-configuration operation. Just create your GitHub repository, add AWS secrets if needed, and push code. The CI/CD pipeline handles the rest!
 
-## �📁 Directory Structure
+## 📁 Directory Structure
 
 Here is a comprehensive overview of the project structure:
-
-### 🗂️ Root Files & Folders
 
 ### 🗂️ Root Files & Folders
 
@@ -280,17 +278,17 @@ Here is a comprehensive overview of the project structure:
 
 ### 📂 Source Directory (`src/`)
 
-- **`main/`** - Production source code
-  - 🎯 `bx/` - BoxLang source files
-    - 🏠 `Application.bx` - Application lifecycle hooks and configuration
-    - ⚡ `Lambda.bx` - **Your Lambda entry point** (implements `run(event, context, response)`)
-    - 📄 _(Add your BoxLang classes here)_
+- 🧑‍💻 **`main/`** - Production source code
+  - `bx/` - BoxLang source files
+    - `Application.bx` - Application lifecycle hooks and configuration
+    - `Lambda.bx` - **Your Lambda entry point** (implements `run(event, context, response)`)
+    - _(Add your BoxLang classes here)_
 - 🧪 **`test/`** - Test source code
-  - ☕ `java/com/myproject/` - JUnit test classes
-    - 🎯 `LambdaIntegrationTest.java` - Comprehensive Lambda integration tests
-    - 🔧 `mocks/TestContext.java` - Mock AWS Lambda Context
-    - 📝 `mocks/TestLogger.java` - Test logging utilities
-    - 🏃 `runner/LocalLambdaRunner.java` - Local Lambda test runner
+  - `java/com/myproject/` - JUnit test classes
+    - `LambdaIntegrationTest.java` - Comprehensive Lambda integration tests
+    - `mocks/TestContext.java` - Mock AWS Lambda Context
+    - `mocks/TestLogger.java` - Test logging utilities
+    - `runner/LocalLambdaRunner.java` - Local Lambda test runner
 - 🗂️ **`resources/`** - Runtime resources
   - ⚙️ `boxlang.json` - BoxLang runtime configuration
   - 📦 `boxlang_modules/` - Local BoxLang modules (auto-packaged)
@@ -885,7 +883,7 @@ ENVIRONMENT=production
 - ✅ **Resource sizing** - Start small, scale up based on needs
 - ✅ **Timeout alignment** - Match Lambda timeout with `boxlang.json` settings
 
-## � Complete Development Workflow
+## 💫 Complete Development Workflow
 
 ### 📋 **From Zero to Deployed**
 
@@ -991,7 +989,7 @@ cat workbench/config.local.env
 ./gradlew stopSamServer           # Stop server
 ```
 
-## �🔧 Development Tips
+## ✅ Development Tips
 
 ### 💡 Best Practices
 
