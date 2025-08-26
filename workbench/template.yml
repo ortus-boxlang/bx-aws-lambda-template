@@ -26,7 +26,7 @@ Resources:
   bxFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: build/distributions/boxlang-aws-project-1.0.0.zip
+      CodeUri: ../build/distributions/boxlang-aws-project-1.0.0.zip
       Handler: ortus.boxlang.runtime.aws.LambdaRunner::handleRequest
       Timeout: !Ref LambdaTimeout
       Runtime: java21
