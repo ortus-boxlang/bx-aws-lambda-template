@@ -43,6 +43,7 @@ This is a BoxLang AWS Lambda template that wraps a BoxLang runtime inside a Java
 ## Project-specific conventions & patterns
 
 - Entrypoint convention: BoxLang lambda handlers expose `run(event, context, response)` (see `src/main/bx/Lambda.bx`). Alternate functions are fine but the runtime expects `run` by example.
+- **NEW: Pascal Case URI Routing**: Multi-class Lambda functions using convention-based routing (e.g., `/products` → `Products.bx`, `/home-savings` → `HomeSavings.bx`). Each class should implement `handler(event, context)` function.
 - Packaging layout: runtime expects `boxlang.json` and `Lambda.bx` at the ZIP root; Java libs go into `lib/` inside the ZIP. See `build.gradle` → `buildLambdaZip`.
 - Tests depend on the Maven dependency `io.boxlang:boxlang-aws-lambda:1.4.0` resolved at build time.
 - `box.json` is used to declare BoxLang modules for publishing/install; local modules for packaging belong in `src/resources/boxlang_modules`.
@@ -62,6 +63,7 @@ This is a BoxLang AWS Lambda template that wraps a BoxLang runtime inside a Java
 
 - `src/main/bx/Lambda.bx` — lambda entrypoint and examples of response shape.
 - `src/main/bx/Application.bx` — lifecycle hooks (onApplicationStart, onRequest, etc.).
+- **Multi-class Lambda structure**: Create additional `.bx` files in `src/main/bx/` for Pascal case routing (e.g., `Products.bx`, `HomeSavings.bx`).
 - `build.gradle` — tasks: `shadowJar`, `buildLambdaZip`, test wiring; Maven dependency declaration.
 - `src/resources/boxlang.json` — runtime configuration (debug/trustedCache/logging/timeouts).
 - `workbench/*` — `1-create-bucket.sh`, `2-deploy.sh`, `3-invoke.sh` show real deployment/invoke flows.
