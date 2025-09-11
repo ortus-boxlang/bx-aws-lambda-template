@@ -41,10 +41,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
 
-      # - name: Setup CommandBox
-      #   uses: Ortus-Solutions/setup-commandbox@v2.0.1
-      #   with:
-      #     forgeboxAPIKey: ${{ secrets.FORGEBOX_API_TOKEN }}
+      - name: Setup CommandBox
+        uses: Ortus-Solutions/setup-commandbox@v2.0.1
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -85,6 +83,7 @@ jobs:
         run: |
           npm install -g markdownlint-cli
           markdownlint changelog.md --fix
+          box install --production
           ./gradlew build -x test --stacktrace --console=plain
 
       - name: Commit Changelog [unreleased] with latest version

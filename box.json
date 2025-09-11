@@ -8,10 +8,11 @@
 		"URL": "https://github.com/ortus-boxlang/mylambda-project"
 	},
 	"bugs": "https://github.com/ortus-boxlang/mylambda-project/issues",
-	"shortDescription": "Module template for BoxLang modules",
+	"shortDescription": "Module template for BoxLang Lambda Projects",
 	"type": "projects",
 	"keywords": [
-		"boxlang"
+		"boxlang",
+		"aws lambda"
 	],
 	"private": false,
 	"devDependencies": {

@@ -27,9 +27,29 @@ jobs:
           distribution: "temurin"
           java-version: ${{ env.JDK_VERSION }}
 
+      - name: Setup CommandBox
+        uses: Ortus-Solutions/setup-commandbox@v2.0.1
+
+      - name: Install BoxLang Modules
+        run: |
+          box install
+
       - name: Test Lambda
         run: |
           ./gradlew test --stacktrace --console=plain
+
+      - name: Publish Test Reports
+        uses: mikepenz/action-junit-report@v5.6.2
+        if: always()
+        with:
+          report_paths: |
+            **/build/test-results/test/*.xml
+            **/surefire-reports/*.xml
+            **/failsafe-reports/*.xml
+          check_name: "JUnit Report"
+          include_passed: false
+          fail_on_failure: true
+          detailed_summary: true
 
       - name: Upload Test Results
         if: always()
@@ -39,25 +59,3 @@ jobs:
           path: |
             **/build/reports/tests/**
             **/build/test-results/**
-
-  publish-test-results:
-    name: Publish Test Results
-    runs-on: ubuntu-latest
-    needs: tests
-    if: always()
-    permissions:
-      checks: write
-      pull-requests: write
-      contents: read
-      issues: read
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v5
-        with:
-          path: artifacts
-
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: |
-            artifacts/**/*.xml
