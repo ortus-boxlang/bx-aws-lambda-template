@@ -11,8 +11,6 @@ plugins {
 /**
  * Project Properties
  */
-sourceCompatibility = jdkVersion
-targetCompatibility = jdkVersion
 ext {
 	buildID = System.getenv( 'BUILD_ID' ) ?: '0'
 	branch = System.getenv( 'BRANCH' ) ?: 'development'
@@ -22,7 +20,6 @@ if ( branch == 'development' ) {
     // If the branch is 'development', ensure the version ends with '-snapshot'
     // This replaces any existing prerelease identifier with '-snapshot'
     version = version.contains('-') ? version.replaceAll(/-.*/, '-snapshot') : "${version}-snapshot"
-	boxlangVersion = boxlangVersion.contains('-') ? boxlangVersion.replaceAll(/-.*/, '-snapshot') : "${boxlangVersion}-snapshot"
 }
 
 repositories {
@@ -32,10 +29,8 @@ repositories {
 
 dependencies {
 	// Includes BoxLang + SLF4J + AWS Lambda Core
-	implementation 'io.boxlang:boxlang-aws-lambda:1.4.0'
+	implementation 'io.boxlang:boxlang-aws-lambda:' + boxlangVersion
 
-    // Testing Dependencies
-	testImplementation 'com.amazonaws:aws-lambda-java-core:1.3.0'
     // Use only one SLF4J implementation to avoid warnings
 	testImplementation( 'org.slf4j:slf4j-nop:2.0.17' ) {
 		// Exclude to avoid conflicts with BoxLang's SLF4J binding
@@ -45,7 +40,7 @@ dependencies {
 	testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.17.+'
 
 	// Testing Frameworks
-    testImplementation "org.junit.jupiter:junit-jupiter:5.+"
+    testImplementation "org.junit.jupiter:junit-jupiter:6.+"
 	testImplementation "org.mockito:mockito-core:5.+"
 	testImplementation "com.google.truth:truth:1.+"
 	// Explicitly declare the JUnit platform launcher (to avoid deprecation)
@@ -53,13 +48,15 @@ dependencies {
 }
 
 java {
+	sourceCompatibility = JavaVersion.toVersion( jdkVersion )
+	targetCompatibility = JavaVersion.toVersion( jdkVersion )
 }
 
 compileJava {
 	// Compiler Options
 	options.incremental = true
 	options.encoding = 'UTF-8'
-	options.debug()
+	options.debug = true
 }
 
 compileTestJava {
