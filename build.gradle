@@ -37,7 +37,7 @@ dependencies {
 		exclude group: 'org.slf4j', module: 'slf4j-api'
 	}
 	// Jackson for JSON parsing in local testing
-	testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.17.+'
+	testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.21.+'
 
 	// Testing Frameworks
     testImplementation "org.junit.jupiter:junit-jupiter:6.+"
